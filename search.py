@@ -85,7 +85,6 @@ def depthFirstSearch(problem):
 
     visited = {}
     state_call_manager = util.Stack()
-    result = []
     state_call_manager.push(((),problem.getStartState()))
 
     while not state_call_manager.isEmpty():
@@ -96,8 +95,7 @@ def depthFirstSearch(problem):
         visited[current] = True
 
         if problem.isGoalState(current):
-            result = current_path_directions
-            return result
+            return current_path_directions
 
         for successor in problem.getSuccessors(current):
             next_node = successor[0]
@@ -114,7 +112,6 @@ def breadthFirstSearch(problem):
 
     visited = {}
     state_call_manager = util.Queue()
-    result = []
     state_call_manager.push(((),problem.getStartState()))
 
     while not state_call_manager.isEmpty():
@@ -125,8 +122,7 @@ def breadthFirstSearch(problem):
         visited[current] = True
 
         if problem.isGoalState(current):
-            result = current_path_directions
-            return result
+            return current_path_directions
 
         for successor in problem.getSuccessors(current):
             next_node = successor[0]
