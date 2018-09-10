@@ -82,37 +82,18 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
     """
-
-    visited = {}
-    state_call_manager = util.Stack()
-    state_call_manager.push(((),problem.getStartState()))
-
-    while not state_call_manager.isEmpty():
-
-        current_node = state_call_manager.pop()
-        current_path_directions = current_node[0]
-        current = current_node[1]
-        visited[current] = True
-
-        if problem.isGoalState(current):
-            return current_path_directions
-
-        for successor in problem.getSuccessors(current):
-            next_node = successor[0]
-            if not visited.has_key(next_node):
-                direction_to_take_reach_next_node = (successor[1],)
-                path_to_next_node = (current_path_directions + direction_to_take_reach_next_node)
-                state_call_manager.push((path_to_next_node,next_node))
-
-    return False
+    return generic_search(problem, util.Stack())
     #util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+    return generic_search(problem,util.Queue())
+    #util.raiseNotDefined()
+
+def generic_search(problem,state_call_manager):
 
     visited = {}
-    state_call_manager = util.Queue()
-    state_call_manager.push(((),problem.getStartState()))
+    state_call_manager.push(((), problem.getStartState()))
 
     while not state_call_manager.isEmpty():
 
@@ -129,10 +110,9 @@ def breadthFirstSearch(problem):
             if not visited.has_key(next_node):
                 direction_to_take_reach_next_node = (successor[1],)
                 path_to_next_node = (current_path_directions + direction_to_take_reach_next_node)
-                state_call_manager.push((path_to_next_node,next_node))
+                state_call_manager.push((path_to_next_node, next_node))
 
     return False
-    #util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
