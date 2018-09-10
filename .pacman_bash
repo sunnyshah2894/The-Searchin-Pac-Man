@@ -1,0 +1,1 @@
+alias manpac="py2 pacman.py -h"
