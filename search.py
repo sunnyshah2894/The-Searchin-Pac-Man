@@ -72,39 +72,6 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-
-def findShortestPathUsingDFS(problem, current, visited, current_path_directions, current_move, direction_types):
-    if problem.isGoalState(current):
-        current_path_directions = current_path_directions + (current_move,)
-        result_till_now = [direct for direct in current_path_directions]
-        return result_till_now
-    else:
-        visited[current] = True
-        current_path_directions = current_path_directions + (current_move,)
-        for prob in problem.getSuccessors(current):
-            if not visited.has_key(prob[0]):
-                result = findShortestPathUsingDFS(problem, prob[0], visited, current_path_directions, direction_types.get(prob[1]), direction_types)
-                if result:
-                    return result
-    return None
-
-
-def find_path_using_dfs(problem, current, current_path_directions, direction_types, visited):
-
-    if problem.isGoalState(current):
-        return current_path_directions
-    else:
-        visited[current] = True
-        for prob in problem.getSuccessors(current):
-            next_node = prob[0]
-            direction_to_take = (direction_types.get(prob[1]),)
-            path_to_next_node = (current_path_directions + direction_to_take)
-            if not visited.has_key(prob[0]):
-                result = find_path_using_dfs(problem, next_node, path_to_next_node, direction_types, visited)
-                if result:
-                    return result
-    return None
-
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -115,63 +82,61 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
     """
-    from game import Directions
-    direction_types = {
-        "South" : Directions.SOUTH,
-        "West" : Directions.WEST,
-        "North" : Directions.NORTH,
-        "East" : Directions.EAST
-    }
 
     visited = {}
-    path_to_goal = ()
-    myStack = util.Stack()
-    result = None
-    myStack.push(((),problem.getStartState()))
+    state_call_manager = util.Stack()
+    result = []
+    state_call_manager.push(((),problem.getStartState()))
 
-    while( not myStack.isEmpty() ):
-        currentNode = myStack.pop()
-        print "working on ",currentNode
-        current_path_directions = currentNode[0]
-        current = currentNode[1]
+    while not state_call_manager.isEmpty():
+
+        current_node = state_call_manager.pop()
+        current_path_directions = current_node[0]
+        current = current_node[1]
         visited[current] = True
+
         if problem.isGoalState(current):
             result = current_path_directions
             return result
 
-        for prob in problem.getSuccessors(current):
-            next_node = prob[0]
-            direction_to_take = (direction_types.get(prob[1]),)
-            path_to_next_node = (current_path_directions + direction_to_take)
-            if not visited.has_key(prob[0]):
-                print "pushing ",next_node
-                myStack.push((path_to_next_node,next_node))
-                #result = find_path_using_dfs(problem, next_node, path_to_next_node, direction_types, visited)
-                if result:
-                    return result
-    return []
+        for successor in problem.getSuccessors(current):
+            next_node = successor[0]
+            if not visited.has_key(next_node):
+                direction_to_take_reach_next_node = (successor[1],)
+                path_to_next_node = (current_path_directions + direction_to_take_reach_next_node)
+                state_call_manager.push((path_to_next_node,next_node))
 
-    # visited[problem.getStartState()] = True
-    # for prob in problem.getSuccessors(problem.getStartState()):
-    #     result = findShortestPathUsingDFS(problem,prob[0],visited,directions,direction.get(prob[1]),direction)
-    #     if result:
-    #         return result
-
-    """
-    result = find_path_using_dfs(problem, problem.getStartState(), path_to_goal, direction_types, visited)
-    if result:
-        return result
-
-    return None
-    """
-
-    #return min(result, key=len)
+    return False
     #util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    visited = {}
+    state_call_manager = util.Queue()
+    result = []
+    state_call_manager.push(((),problem.getStartState()))
+
+    while not state_call_manager.isEmpty():
+
+        current_node = state_call_manager.pop()
+        current_path_directions = current_node[0]
+        current = current_node[1]
+        visited[current] = True
+
+        if problem.isGoalState(current):
+            result = current_path_directions
+            return result
+
+        for successor in problem.getSuccessors(current):
+            next_node = successor[0]
+            if not visited.has_key(next_node):
+                direction_to_take_reach_next_node = (successor[1],)
+                path_to_next_node = (current_path_directions + direction_to_take_reach_next_node)
+                state_call_manager.push((path_to_next_node,next_node))
+
+    return False
+    #util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
