@@ -93,24 +93,26 @@ def breadthFirstSearch(problem):
 def generic_search(problem,state_call_manager):
 
     visited = {}
-    state_call_manager.push(((), problem.getStartState()))
+    state_call_manager.push(((), problem.getStartState(),  0))  # (path,currentNode,cost)
 
     while not state_call_manager.isEmpty():
 
-        current_node = state_call_manager.pop()
-        current_path_directions = current_node[0]
-        current = current_node[1]
-        visited[current] = True
+        current_state = state_call_manager.pop()
+        current_path_directions = current_state[0]
+        current_node = current_state[1]
+        cost_till_now = current_state[2]
 
-        if problem.isGoalState(current):
-            return current_path_directions
+        visited[current_node] = True
 
-        for successor in problem.getSuccessors(current):
+        if problem.isGoalState(current_node):
+            return [node[1] for node in current_path_directions]
+
+        for successor in problem.getSuccessors(current_node):
             next_node = successor[0]
+            cost_next_node = cost_till_now + successor[2]
             if not visited.has_key(next_node):
-                direction_to_take_reach_next_node = (successor[1],)
-                path_to_next_node = (current_path_directions + direction_to_take_reach_next_node)
-                state_call_manager.push((path_to_next_node, next_node))
+                path_to_next_node = current_path_directions + (successor,)
+                state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node))
 
     return False
 
