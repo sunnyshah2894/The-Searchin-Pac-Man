@@ -281,7 +281,6 @@ class CornersProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
-        print top," ", right
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
@@ -412,7 +411,18 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    #""" Shortest path based heuristic function - expands a total of 1730 nodes
+    #""" Shortest path based heuristic function - expands a total of 592 nodes
+
+    """
+    Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5
+    Path found with total cost of 106 in 0.0 seconds
+    Search nodes expanded: 592
+    Pacman emerges victorious! Score: 434
+    Average Score: 434.0
+    Scores:        434.0
+    Win Rate:      1/1 (1.00)
+    Record:        Win
+    """
     x, y = state[0]
     cor_rem = state[1]
     top, right = walls.height - 2, walls.width - 2
