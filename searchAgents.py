@@ -281,6 +281,7 @@ class CornersProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
+        print top," ", right
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
@@ -288,6 +289,41 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         self.action_cost = 1
+
+        #""" To support the shortest path heuristic function
+        self.dpleftbottom = [ [top*right]*(right) for y in range(top)]
+        self.dprightbottom = [[top * right] * (right) for y in range(top)]
+        self.dplefttop = [[top * right] * (right) for y in range(top)]
+        self.dprighttop = [[top * right] * (right) for y in range(top)]
+        self.generateshortestPath(0,0,self.dpleftbottom,right,top)
+        self.generateshortestPath(top-1,0,self.dplefttop,right,top)
+        self.generateshortestPath(0, right - 1, self.dprightbottom, right, top)
+        self.generateshortestPath(top - 1, right - 1, self.dprighttop, right, top)
+        #"""
+
+    def generateshortestPath(self,x,y,dp,right,top):
+        q = util.Queue()
+        visited = [[False] * right for y in range(top)]
+        q.push( ((x,y),0) )
+        visited[x][y] = True
+        while not q.isEmpty():
+            state = q.pop()
+            x,y = state[0]
+            cost = state[1]
+            dp[x][y] = cost
+            if x != 0 and not visited[x-1][y]:
+                q.push(((x-1,y),cost+1))
+                visited[x-1][y] = True
+            if y != 0 and not visited[x][y-1]:
+                q.push(((x,y-1), cost + 1))
+                visited[x][y-1] = True
+            if x != top-1 and not visited[x+1][y]:
+                q.push(((x+1,y), cost + 1))
+                visited[x+1][y] = True
+            if y != right-1 and not visited[x][y+1]:
+                q.push(((x,y+1), cost + 1))
+                visited[x][y+1] = True
+
 
     def getStartState(self):
         """
@@ -369,18 +405,38 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
+    #""" Shortest path based heuristic function - expands a total of 1730 nodes
+    x, y = state[0]
+    cor_rem = state[1]
+    top, right = walls.height - 2, walls.width - 2
+    distance = []
+    for (x1, y1) in cor_rem:
+        if x1 == 1 and y1 == 1:  # left bottom
+            distance.append( problem.dpleftbottom[y - 1][x - 1] )
+        if x1 == 1 and y1 == top:  # left top
+            distance.append(problem.dplefttop[y - 1][x - 1] )
+        if x1 == right and y1 == 1:  # right bottom
+            distance.append(problem.dprightbottom[y - 1][x - 1] )
+        if x1 == right and y1 == top:  # left bottom
+            distance.append(problem.dprighttop[y - 1][x - 1] )
 
-    """ manhattan distance heuristic - expands a total of 284697 nodes
+    sorted(distance)
+    return sum(distance)
+    #return sum(distance)
+    #"""
+
+    """manhattan distance heuristic - expands a total of 21920 nodes
     x,y = state[0]
     cor_rem = state[1]
     distance =  [ (abs(x-x1)+abs(y-y1)) for (x1,y1) in cor_rem ]
 
     if distance:
-        return min(distance)
+        return sum(distance)
+
+    return 0
     """
     """ null heuristic - expands a total of 2010522 nodes """
-    return 0 # Default to trivial solution
+    #return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -474,7 +530,25 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    """
+    Sunnys - MacBook - Pro:search sunnyshah$ py2 pacman.py - l trickySearch - p AStarFoodSearchAgent 
+    Path found with total cost of 120 in 5.8 seconds
+    Search nodes expanded: 308
+    Pacman emerges victorious! Score: 510
+    Average
+    Score: 510.0
+    Scores:        510.0
+    Win
+    Rate:      1 / 1(1.00)
+    Record:        Win
+    """
+
+    sum = 0
+    for food in foodGrid.asList():
+        sum += mazeDistance(position, food, problem.startingGameState)
+
+    return sum
+    #return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
