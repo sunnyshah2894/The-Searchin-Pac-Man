@@ -561,12 +561,17 @@ def foodHeuristic(state, problem):
     Rate:      1 / 1(1.00)
     Record:        Win
     """
-
-    sum = 0
+    print position
+    sumright = 0
+    sumleft = 0
     for food in foodGrid.asList():
-        sum += mazeDistance(position, food, problem.startingGameState)
+        if food[0] < position[0]:
+            sumleft += 1
+        if food[0] > position[0]:
+            sumright += 1
+        #sum = min(sum,mazeDistance(position, food, problem.startingGameState))
 
-    return sum
+    return -1*(abs(sumleft-sumright))
     #return 0
 
 class ClosestDotSearchAgent(SearchAgent):
