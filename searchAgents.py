@@ -387,14 +387,6 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-def findMinimumFromCorners():
-    sum1 = 0
-    sum1 += problem.dpleftbottom[y - 1][x - 1]
-    for (x2, y2) in cor_rem:
-        if x1 != x2 and y1 != y2:
-            sum1 += problem.dpleftbottom[y2 - 1][x2 - 1]
-    distance.append(sum1)
-
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
