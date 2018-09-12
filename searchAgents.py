@@ -388,6 +388,13 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+def findMinimumFromCorners():
+    sum1 = 0
+    sum1 += problem.dpleftbottom[y - 1][x - 1]
+    for (x2, y2) in cor_rem:
+        if x1 != x2 and y1 != y2:
+            sum1 += problem.dpleftbottom[y2 - 1][x2 - 1]
+    distance.append(sum1)
 
 def cornersHeuristic(state, problem):
     """
@@ -412,17 +419,17 @@ def cornersHeuristic(state, problem):
     distance = []
     for (x1, y1) in cor_rem:
         if x1 == 1 and y1 == 1:  # left bottom
-            distance.append( problem.dpleftbottom[y - 1][x - 1] )
+            distance.append(find_minimum_from_corners(cor_rem, problem.dpleftbottom, x, x1, y, y1))
         if x1 == 1 and y1 == top:  # left top
-            distance.append(problem.dplefttop[y - 1][x - 1] )
+            distance.append(find_minimum_from_corners(cor_rem, problem.dplefttop, x, x1, y, y1))
         if x1 == right and y1 == 1:  # right bottom
-            distance.append(problem.dprightbottom[y - 1][x - 1] )
+            distance.append(find_minimum_from_corners(cor_rem, problem.dprightbottom, x, x1, y, y1))
         if x1 == right and y1 == top:  # left bottom
-            distance.append(problem.dprighttop[y - 1][x - 1] )
+            distance.append(find_minimum_from_corners(cor_rem, problem.dprighttop, x, x1, y, y1))
 
     sorted(distance)
     return sum(distance)
-    #return sum(distance)
+
     #"""
 
     """manhattan distance heuristic - expands a total of 21920 nodes
@@ -437,6 +444,16 @@ def cornersHeuristic(state, problem):
     """
     """ null heuristic - expands a total of 2010522 nodes """
     #return 0 # Default to trivial solution
+
+
+def find_minimum_from_corners(cor_rem, dp, x, x1, y, y1):
+    sum = 0
+    sum += dp[y - 1][x - 1]
+    for (x2, y2) in cor_rem:
+        if x1 != x2 and y1 != y2:
+            sum += dp[y2 - 1][x2 - 1]
+    return sum
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
