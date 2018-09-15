@@ -478,6 +478,24 @@ class FoodSearchProblem:
         self.startingGameState = startingGameState
         self._expanded = 0 # DO NOT CHANGE
         self.heuristicInfo = {} # A dictionary for the heuristic to store information
+        self.distance = {}
+        foodGrid = startingGameState.getFood()
+        self.mapfoodtonumber = {}
+        self.mapnumbertofood = {}
+        uniqueNumber = 0
+        for food in foodGrid.asList():
+            if( not self.mapfoodtonumber.has_key(food) ):
+                self.mapfoodtonumber[food] = uniqueNumber
+                self.mapnumbertofood[uniqueNumber] = food
+                uniqueNumber += 1
+            for other_food in foodGrid.asList():
+                if (not self.mapfoodtonumber.has_key(other_food)):
+                    self.mapfoodtonumber[other_food] = uniqueNumber
+                    self.mapnumbertofood[uniqueNumber] = other_food
+                    uniqueNumber += 1
+                dist = mazeDistance(food, other_food, startingGameState)
+                self.distance[ (self.mapfoodtonumber[food],self.mapfoodtonumber[other_food]) ] = dist
+                self.distance[ (self.mapfoodtonumber[other_food],self.mapfoodtonumber[food]) ] = dist
 
     def getStartState(self):
         return self.start
@@ -561,6 +579,7 @@ def foodHeuristic(state, problem):
     Rate:      1 / 1(1.00)
     Record:        Win
     """
+    """
     print position
     sumright = 0
     sumleft = 0
@@ -572,6 +591,72 @@ def foodHeuristic(state, problem):
         #sum = min(sum,mazeDistance(position, food, problem.startingGameState))
 
     return -1*(abs(sumleft-sumright))
+    """
+
+    maxDistance = -1
+    point1 = None
+    point2 = None
+
+    if len(foodGrid.asList())==0:
+        return 0
+
+    for food in foodGrid.asList():
+        for other_food in foodGrid.asList():
+            if( maxDistance < problem.distance[(problem.mapfoodtonumber[food],problem.mapfoodtonumber[other_food])] ):
+                maxDistance = problem.distance[(problem.mapfoodtonumber[food],problem.mapfoodtonumber[other_food])]
+                point1 = food
+                point2 = other_food
+
+    minDistance = min( mazeDistance(position,point1,problem.startingGameState), mazeDistance(position,point2,problem.startingGameState) )
+
+    #print "for {0} the distance is {1}".format(position,(minDistance+maxDistance))
+    return minDistance + maxDistance
+
+    """
+    result = 0
+    next_foodGrid = foodGrid.deepCopy()
+    next_position = position[:]
+    for i in range(2):
+        # print "Step ",x,y,next_position,next_foodGrid
+        # compute the distances : (x,y,dist) only for existing food
+        dist_to_dots = []
+        for y2 in range(foodGrid.height):
+            for x2 in range(foodGrid.width):
+                if (next_foodGrid[x2][y2]):
+                    dist_to_dots.append((x2, y2, util.manhattanDistance(next_position, (x2, y2))))
+        # print "dist_to_dots ",dist_to_dots
+
+        if (len(dist_to_dots) == 0):
+            break
+
+        x_closest, y_closest, dist_closest = dist_to_dots[0]
+
+        for (x2, y2, dist) in dist_to_dots:
+            # print "Compare ",next_foodGrid[x_closest][y_closest],dist_to_dots[y2][x2],dist_to_dots[y_closest][x_closest]
+            if (i == 0) and (dist < dist_closest):
+                x_closest = x2
+                y_closest = y2
+                dist_closest = dist
+            if (i == 1) and (dist > dist_closest):
+                x_closest = x2
+                y_closest = y2
+                dist_closest = dist
+        # print "closest ",x_closest,y_closest
+        result += dist_closest
+        next_position = (x_closest, y_closest)
+        next_foodGrid[x_closest][y_closest] = False
+        # print "Move to ",next_position
+
+    return result
+    """
+
+    """
+    sum = 0
+    for food in foodGrid.asList():
+        sum += mazeDistance(food,position,problem.startingGameState)
+    return sum
+    """
+
     #return 0
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -604,6 +689,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
+
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
