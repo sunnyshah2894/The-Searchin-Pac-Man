@@ -118,6 +118,10 @@ def generic_search(problem,state_call_manager):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
+
+    return generic_search(problem, util.PriorityQueueWithFunction(lambda (x,y,z) : z ))
+
+    """
     visited = {}
     state_call_manager = util.PriorityQueue();
     state_call_manager.push(((), problem.getStartState(),  0),0)  # (path,currentNode,cost)
@@ -142,6 +146,7 @@ def uniformCostSearch(problem):
                 state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node),cost_next_node)
 
     return False
+    """
     #util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
