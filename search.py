@@ -87,10 +87,15 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    return generic_search(problem,util.Queue())
+    return generic_search(problem, util.Queue())
     #util.raiseNotDefined()
 
 def generic_search(problem,state_call_manager):
+    """
+        Defines a general algorithm to search a graph.
+        Parameters are structure, which can be any data structure with .push() and .pop() methods, and problem, which is the
+        search problem.
+        """
 
     visited = {}
     state_call_manager.push(((), problem.getStartState(),  0))  # (path,currentNode,cost)
@@ -102,14 +107,18 @@ def generic_search(problem,state_call_manager):
         current_node = current_state[1]
         cost_till_now = current_state[2]
 
-        visited[current_node] = True
-
         if problem.isGoalState(current_node):
             return [node[1] for node in current_path_directions]
+
+        if visited.has_key(current_node):
+            continue
+
+        visited[current_node] = True
 
         for successor in problem.getSuccessors(current_node):
             next_node = successor[0]
             cost_next_node = cost_till_now + successor[2]
+
             if not visited.has_key(next_node):
                 path_to_next_node = current_path_directions + (successor,)
                 state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node))
@@ -159,7 +168,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     visited = {}
-    state_call_manager = util.PriorityQueue();
+    state_call_manager = util.PriorityQueue()
     state_call_manager.push(((), problem.getStartState(),  0),0)  # (path,currentNode,cost)
 
     while not state_call_manager.isEmpty():
@@ -169,14 +178,18 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         current_node = current_state[1]
         cost_till_now = current_state[2] - heuristic(current_node,problem)
 
-        visited[current_node] = True
-
         if problem.isGoalState(current_node):
             return [node[1] for node in current_path_directions]
+
+        if visited.has_key(current_node):
+            continue
+
+        visited[current_node] = True
 
         for successor in problem.getSuccessors(current_node):
             next_node = successor[0]
             cost_next_node = cost_till_now + successor[2] + heuristic(next_node,problem)
+
             if not visited.has_key(next_node):
                 path_to_next_node = current_path_directions + (successor,)
                 state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node),cost_next_node)
