@@ -177,7 +177,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         current_path_directions = current_state[0]
         current_node = current_state[1]
         cost_till_now = current_state[2] - heuristic(current_node,problem)
-
+        #print "selected = " , current_state , " whose cost is " , cost_till_now , " and heuristic = " , heuristic(current_node,problem)
         if problem.isGoalState(current_node):
             return [node[1] for node in current_path_directions]
 
@@ -192,6 +192,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
             if not visited.has_key(next_node):
                 path_to_next_node = current_path_directions + (successor,)
+                #print "adding ",next_node,cost_next_node," with heuristic = " , heuristic(next_node,problem)
                 state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node),cost_next_node)
 
     return False
