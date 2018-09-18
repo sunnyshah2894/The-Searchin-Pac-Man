@@ -129,33 +129,6 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
     return generic_search(problem, util.PriorityQueueWithFunction(lambda (x,y,z) : z ))
-
-    """
-    visited = {}
-    state_call_manager = util.PriorityQueue();
-    state_call_manager.push(((), problem.getStartState(),  0),0)  # (path,currentNode,cost)
-
-    while not state_call_manager.isEmpty():
-
-        current_state = state_call_manager.pop()
-        current_path_directions = current_state[0]
-        current_node = current_state[1]
-        cost_till_now = current_state[2]
-
-        visited[current_node] = True
-
-        if problem.isGoalState(current_node):
-            return [node[1] for node in current_path_directions]
-
-        for successor in problem.getSuccessors(current_node):
-            next_node = successor[0]
-            cost_next_node = cost_till_now + successor[2]
-            if not visited.has_key(next_node):
-                path_to_next_node = current_path_directions + (successor,)
-                state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node),cost_next_node)
-
-    return False
-    """
     #util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -168,15 +141,17 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     visited = {}
-    state_call_manager = util.PriorityQueue()
-    state_call_manager.push(((), problem.getStartState(),  0),0)  # (path,currentNode,cost)
+    state_call_manager = util.PriorityQueueWithFunction(lambda (p,q,r,s) : r )
+    heuristic_start_node = heuristic(problem.getStartState(), problem)
+    state_call_manager.push(  (   (),  problem.getStartState(),  0+heuristic_start_node  ,  heuristic_start_node ) )  # (path,currentNode,cost,heuristic)
 
     while not state_call_manager.isEmpty():
 
         current_state = state_call_manager.pop()
         current_path_directions = current_state[0]
         current_node = current_state[1]
-        cost_till_now = current_state[2] - heuristic(current_node,problem)
+        heuristic_current_node = current_state[3];
+        cost_till_now = current_state[2] - heuristic_current_node
         #print "selected = " , current_state , " whose cost is " , cost_till_now , " and heuristic = " , heuristic(current_node,problem)
         if problem.isGoalState(current_node):
             return [node[1] for node in current_path_directions]
@@ -188,12 +163,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
         for successor in problem.getSuccessors(current_node):
             next_node = successor[0]
-            cost_next_node = cost_till_now + successor[2] + heuristic(next_node,problem)
+            heuristic_next_node = heuristic(next_node,problem)
+            cost_next_node = cost_till_now + successor[2] + heuristic_next_node
 
             if not visited.has_key(next_node):
                 path_to_next_node = current_path_directions + (successor,)
                 #print "adding ",next_node,cost_next_node," with heuristic = " , heuristic(next_node,problem)
-                state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node),cost_next_node)
+                state_call_manager.push((tuple(path_to_next_node), next_node, cost_next_node,heuristic_next_node))
 
     return False
     #util.raiseNotDefined()
