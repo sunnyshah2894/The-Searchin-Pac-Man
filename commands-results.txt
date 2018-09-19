@@ -1,0 +1,191 @@
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l tinyMaze -p SearchAgent -a fn=tinyMazeSearch
+[SearchAgent] using function tinyMazeSearch
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 8 in 0.0 seconds
+Search nodes expanded: 0
+Pacman emerges victorious! Score: 502
+Average Score: 502.0
+Scores:        502.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l tinyMaze -p SearchAgent
+[SearchAgent] using function depthFirstSearch
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 10 in 0.0 seconds
+Search nodes expanded: 15
+Pacman emerges victorious! Score: 500
+Average Score: 500.0
+Scores:        500.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumMaze -p SearchAgent
+[SearchAgent] using function depthFirstSearch
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 130 in 0.0 seconds
+Search nodes expanded: 146
+Pacman emerges victorious! Score: 380
+Average Score: 380.0
+Scores:        380.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l bigMaze -z .5 -p SearchAgent
+[SearchAgent] using function depthFirstSearch
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 210 in 0.0 seconds
+Search nodes expanded: 390
+Pacman emerges victorious! Score: 300
+Average Score: 300.0
+Scores:        300.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
+[SearchAgent] using function bfs
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 68 in 0.0 seconds
+Search nodes expanded: 269
+Pacman emerges victorious! Score: 442
+Average Score: 442.0
+Scores:        442.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l bigMaze -p SearchAgent -a fn=bfs -z .5
+[SearchAgent] using function bfs
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 210 in 0.1 seconds
+Search nodes expanded: 620
+Pacman emerges victorious! Score: 300
+Average Score: 300.0
+Scores:        300.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 eightpuzzle.py
+A random puzzle:
+-------------
+| 1 | 4 | 2 |
+-------------
+| 3 | 7 | 5 |
+-------------
+| 6 |   | 8 |
+-------------
+BFS found a path of 3 moves: ['up', 'up', 'left']
+After 1 move: up
+-------------
+| 1 | 4 | 2 |
+-------------
+| 3 |   | 5 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 2 moves: up
+-------------
+| 1 |   | 2 |
+-------------
+| 3 | 4 | 5 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...After 3 moves: left
+-------------
+|   | 1 | 2 |
+-------------
+| 3 | 4 | 5 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
+[SearchAgent] using function ucs
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 68 in 0.0 seconds
+Search nodes expanded: 269
+Pacman emerges victorious! Score: 442
+Average Score: 442.0
+Scores:        442.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumDottedMaze -p StayEastSearchAgent
+Path found with total cost of 1 in 0.0 seconds
+Search nodes expanded: 186
+Pacman emerges victorious! Score: 646
+Average Score: 646.0
+Scores:        646.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumScaryMaze -p StayWestSearchAgent
+Path found with total cost of 68719479864 in 0.0 seconds
+Search nodes expanded: 108
+Pacman emerges victorious! Score: 418
+Average Score: 418.0
+Scores:        418.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+[SearchAgent] using function astar and heuristic manhattanHeuristic
+[SearchAgent] using problem type PositionSearchProblem
+Path found with total cost of 210 in 0.1 seconds
+Search nodes expanded: 549
+Pacman emerges victorious! Score: 300
+Average Score: 300.0
+Scores:        300.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l tinyCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+[SearchAgent] using function bfs
+[SearchAgent] using problem type CornersProblem
+Path found with total cost of 28 in 0.0 seconds
+Search nodes expanded: 356
+Pacman emerges victorious! Score: 512
+Average Score: 512.0
+Scores:        512.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+[SearchAgent] using function bfs
+[SearchAgent] using problem type CornersProblem
+Path found with total cost of 106 in 0.1 seconds
+Search nodes expanded: 2742
+Pacman emerges victorious! Score: 434
+Average Score: 434.0
+Scores:        434.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5
+Path found with total cost of 106 in 0.1 seconds
+Search nodes expanded: 965
+Pacman emerges victorious! Score: 434
+Average Score: 434.0
+Scores:        434.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l testSearch -p AStarFoodSearchAgent
+Path found with total cost of 7 in 0.0 seconds
+Search nodes expanded: 7
+Pacman emerges victorious! Score: 513
+Average Score: 513.0
+Scores:        513.0
+Win Rate:      1/1 (1.00)
+Record:        Win
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l trickySearch -p AStarFoodSearchAgent
+Path found with total cost of 60 in 2.0 seconds
+Search nodes expanded: 376
+Pacman emerges victorious! Score: 570
+Average Score: 570.0
+Scores:        570.0
+Win Rate:      1/1 (1.00)
+Record:        Win
