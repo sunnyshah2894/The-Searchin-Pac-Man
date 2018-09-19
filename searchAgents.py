@@ -287,77 +287,135 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
+
+        # default cost to use when generating the successors
         self.action_cost = 1
 
-        #""" To support the shortest path heuristic function
-        self.dpleftbottom = [ [top*right]*(right) for y in range(top)]
-        self.dprightbottom = [[top * right] * (right) for y in range(top)]
-        self.dplefttop = [[top * right] * (right) for y in range(top)]
-        self.dprighttop = [[top * right] * (right) for y in range(top)]
+        """
+            The below code will be used by cornersHeuristic to calculate the heuristic value for each node. 
+            The aim of the below code is to find the following details:
+                o dpleftbottom[][] -> Store the shortest path from the left bottom (1,1) corner to everypoint in the maze.
+                o dprightbottom[][] -> Store the shortest path from the right bottom (right,1) corner to everypoint in the maze.
+                o dplefttop[][] -> Store the shortest path from the top left (1,top) corner to everypoint in the maze.
+                o dprighttop[][] -> Store the shortest path from the top right (right,top) corner to everypoint in the maze.
+             
+        """
+        # initiaze our dp arrays with size of (top x right) and default value to be the max value (top x right)
+        self.dpleftbottom   = [ [top * right] * (right) for y in range(top)]
+        self.dprightbottom  = [ [top * right] * (right) for y in range(top)]
+        self.dplefttop      = [ [top * right] * (right) for y in range(top)]
+        self.dprighttop     = [ [top * right] * (right) for y in range(top)]
 
-        self.generateshortestPath(0,0,self.dpleftbottom,right,top,startingGameState)
-        self.generateshortestPath(top-1,0,self.dplefttop,right,top,startingGameState)
-        self.generateshortestPath(0, right - 1, self.dprightbottom, right, top,startingGameState)
-        self.generateshortestPath(top - 1, right - 1, self.dprighttop, right, top,startingGameState)
+        """
+            To populate the DP arrays, we make use of our custom self.generateshortestPath. The function starts from a corner and assign incremental distance 
+            to its successors. The overall complexity of the method is O(n^2). Thus, it can easily calculate the dp values of maze with sizes upto 2500 x 2500.
+            
+            We pass the function, ( corner.x , corner.y , appropriateDP , value of right i.e. max x coordinate , value of top i.e. max y coordinate )
+            
+            Also, note that since, graph in maze problem starts from bottom left corner i.e. in a game maze, the bottom left point is (1,1), as compared 
+            to our DP matrix, where topleft is (1,1), we flip (x,y) when storing in the DP array.
+            i.e. point (x,y) in the game maze is (y-1,x-1) in our DP array. ( (y-1),(x-1) => because our graph representation in DP array starts from (0,0) 
+            and not (1,1) as in a game maze
+            
+            i.e. distance of point (x,y) from left bottom (1,1) corner will be dpleftbottom[ y-1 ][ x-1 ]
+            
+        """
+        self.generateshortestPath(  0       , 0         , self.dpleftbottom  , right , top )
+        self.generateshortestPath( top-1    , 0         , self.dplefttop     , right , top )
+        self.generateshortestPath( 0        , right - 1 , self.dprightbottom , right , top )
+        self.generateshortestPath( top - 1  , right - 1 , self.dprighttop    , right , top )
 
-        #print self.dpleftbottom
-        #print self.dprightbottom
-        #print self.dplefttop
-        #print self.dprighttop
+        """
+            Now our DParrays are populated correctly and we have the minimum distance from each point to each of the corners in our DP arrays. 
+        """
 
-        #print top,right
-        self.shortestDistance = {}
+        """
+            To optimize the solution a bit, I have also created a dictionary to store the shortest distance between each pair of corners:
+            shortestDistanceBetweenCorners => stores the values as ( key,value ) pair, 
+                    where key -> ( (corner1),(corner2) )
+                    
+            Between 4 corners, there can be total of 4*3 ordered pair of corners and we need to store distance between each pair of corner in our
+            dictionary 
+        """
 
-        self.shortestDistance[((1, 1),(1, top))] = min(self.dpleftbottom[top-1][0],self.dplefttop[0][0])
-        self.shortestDistance[((1, top),(1, 1))] = min(self.dpleftbottom[top - 1][0], self.dplefttop[0][0])
+        self.shortestDistanceBetweenCorners = {}
 
-        self.shortestDistance[((1, 1), (right, 1))] = min(self.dpleftbottom[0][right-1], self.dprightbottom[0][0])
-        self.shortestDistance[((right, 1), (1, 1))] = min(self.dpleftbottom[0][right-1], self.dprightbottom[0][0])
+        # store the shortest distance between leftbottom and lefttop corner
+        # The minimum distance will be min( distance of lefttop from leftbottom , distance of leftbottom from lefttop )
+        self.shortestDistanceBetweenCorners[((1, 1), (1, top))] = min(self.dpleftbottom[top - 1][0], self.dplefttop[0][0])
+        self.shortestDistanceBetweenCorners[((1, top), (1, 1))] = min(self.dpleftbottom[top - 1][0], self.dplefttop[0][0])
 
-        self.shortestDistance[((1, 1), (right, top))] = min(self.dpleftbottom[top - 1][right-1], self.dprighttop[0][0])
-        self.shortestDistance[((right, top), (1, 1))] = min(self.dpleftbottom[top - 1][right-1], self.dprighttop[0][0])
+        # Similarly calculate the same for all the other pairs of corners
+        self.shortestDistanceBetweenCorners[((1, 1), (right, 1))] = min(self.dpleftbottom[0][right - 1], self.dprightbottom[0][0])
+        self.shortestDistanceBetweenCorners[((right, 1), (1, 1))] = min(self.dpleftbottom[0][right - 1], self.dprightbottom[0][0])
 
-        self.shortestDistance[((1, top), (right, 1))] = min(self.dplefttop[0][right-1], self.dprightbottom[top-1][0])
-        self.shortestDistance[((right, 1), (1, top))] = min(self.dplefttop[0][right-1], self.dprightbottom[top-1][0])
+        self.shortestDistanceBetweenCorners[((1, 1), (right, top))] = min(self.dpleftbottom[top - 1][right - 1], self.dprighttop[0][0])
+        self.shortestDistanceBetweenCorners[((right, top), (1, 1))] = min(self.dpleftbottom[top - 1][right - 1], self.dprighttop[0][0])
 
-        self.shortestDistance[((1, top), (right, top))] = min(self.dplefttop[top-1][right - 1],self.dprighttop[top - 1][0])
-        self.shortestDistance[((right, top), (1, top))] = min(self.dplefttop[top-1][right - 1],self.dprighttop[top - 1][0])
+        self.shortestDistanceBetweenCorners[((1, top), (right, 1))] = min(self.dplefttop[0][right - 1], self.dprightbottom[top - 1][0])
+        self.shortestDistanceBetweenCorners[((right, 1), (1, top))] = min(self.dplefttop[0][right - 1], self.dprightbottom[top - 1][0])
 
-        self.shortestDistance[((right, 1), (right, top))] = min(self.dprightbottom[top - 1][right - 1], self.dprighttop[0][right-1])
-        self.shortestDistance[((right, top), (right, 1))] = min(self.dprightbottom[top - 1][right - 1], self.dprighttop[0][right-1])
+        self.shortestDistanceBetweenCorners[((1, top), (right, top))] = min(self.dplefttop[top - 1][right - 1], self.dprighttop[top - 1][0])
+        self.shortestDistanceBetweenCorners[((right, top), (1, top))] = min(self.dplefttop[top - 1][right - 1], self.dprighttop[top - 1][0])
 
-        #print "11to1top",self.shortestDistance[((1, 1),(1, top))]
-        #print "11toright1", self.shortestDistance[((1, 1), (right, 1))]
-        #print "11torighttop", self.shortestDistance[((1, 1), (right, top))]
-        #print "1toptoright1", self.shortestDistance[((1, top), (right, 1))]
-        #print "1toptorighttop", self.shortestDistance[((1, top), (right, top))]
-        #print "right1torighttop", self.shortestDistance[((right, 1), (right, top))]
+        self.shortestDistanceBetweenCorners[((right, 1), (right, top))] = min(self.dprightbottom[top - 1][right - 1], self.dprighttop[0][right - 1])
+        self.shortestDistanceBetweenCorners[((right, top), (right, 1))] = min(self.dprightbottom[top - 1][right - 1], self.dprighttop[0][right - 1])
 
-        #"""
 
-    def generateshortestPath(self,x,y,dp,right,top,problem):
-        q = util.Queue()
+    def generateshortestPath(self,cornerx,cornery,dp,right,top):
+
+        """
+            Find the shortest path from a given corner to each point in the graph:
+
+            Steps:
+                1 Start with the given corner, mark it visited, add its distance from the corner as 0.
+                    o Also, push the given corner to the queue
+
+                Repeat step 2 to 4 until queue is empty
+                    2 Pop a point from the queue.
+                    3 Note its distance in our DP matrix.
+                    4 Find all its successors
+                        4.1 If the successor is not yet visited and is not a wall
+                        4.2 Add the successor to the queue and mark its distance as (distance of current-node + 1)
+
+        """
+
+        # initialize our state manager
+        state_manager = util.Queue()
+
+        # Set visisted of every node as false
         visited = [[False] * right for k in range(top)]
-        #print "called for ",(x,y)
-        q.push( ((x,y),0) )
-        visited[x][y] = True
-        # for i in range(top):
-        #     for j in range(right):
-        #         if problem.walls[i][j] == False:
-        #             dp[i][j] = mazeDistance((x,y),(i,j),problem)
-        while not q.isEmpty():
-            state = q.pop()
-            x1,y1 = state[0]
-            cost = state[1]
-            #print "setting: ",(x1,y1)," = ",state[1]
-            dp[x1][y1] = cost
-            for successor in self.getSuccessors(((y1+1,x1+1),self.corners)):
-                # print "successor",successor
-                x2,y2 = successor[0][0]
-                if not visited[y2-1][x2-1]:
-                    if self.walls[x2][y2] == False:
-                        q.push(((y2-1, x2-1), cost + 1))
-                        visited[y2-1][x2-1] = True
+
+        # Push the given corner ( (coordinates),distance ) to state manager with distance of 0
+        state_manager.push( ((cornerx,cornery),0) )
+
+        # Mark the given corner as visited/expanded
+        visited[cornerx][cornery] = True
+
+        while not state_manager.isEmpty():
+
+            # remove the next Node
+            state = state_manager.pop()
+            # find the coordinate of the current node
+            current_node_x,current_node_y = state[0]
+            # find the distance of the current node from given corner
+            cost_current_node = state[1]
+            # Push the distance of the current node to our DP matrix
+            dp[current_node_x][current_node_y] = cost_current_node
+
+            for successor in self.getSuccessors(((current_node_y+1,current_node_x+1),self.corners)):
+
+                # find the coordinate of the next node
+                next_node_x,next_node_y = successor[0][0]
+
+                # if the next successor node is not visited and is not a wall, add it to the state_manager
+                if not visited[next_node_y-1][next_node_x-1]:
+                    if self.walls[next_node_x][next_node_y] == False:
+
+                        # push the next_node and its distance to the state_manager
+                        state_manager.push(((next_node_y-1, next_node_x-1), cost_current_node + 1))
+                        # mark the next_node as visited
+                        visited[next_node_y-1][next_node_x-1] = True
 
 
     def getStartState(self):
@@ -365,18 +423,33 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
+        """
+            Our state information is now not only the (state,action,cost), but along with this the corners are also part of our state information now.
+            So, in addition to returning the startingPostion, we should also return the corner details for the problem.
+            
+            Thus, our start state is now a tuple of ( actual game startingPosition, game corners )  
+        """
         return (self.startingPosition, self.corners)
-        #util.raiseNotDefined()
+
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        if state[1]:
+
+        # Note our state was of the form ( state position , corners yet to traverse )
+        corners_remaining = state[1]
+
+        """
+            Our goal state will be the one where corners list is empty i.e. all the corners are already traversed
+        """
+
+        # if corners_remaining is not empty return false else return true
+        if corners_remaining:
             return False
         else:
             return True
-        #util.raiseNotDefined()
+
 
     def getSuccessors(self, state):
         """
@@ -398,13 +471,22 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
             x, y = state[0]
+            corners_remaining = state[1]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
-            if self.walls[nextx][nexty] == False :
+            hitsWall = self.walls[nextx][nexty]
+
+            # if the next node is a wall, only then it can be a successor where pacman can move
+            if not hitsWall :
+
                 next_position = (nextx, nexty)
-                corners_left = tuple([ c for c in state[1] if c != (nextx, nexty)])
+
+                # if the next_position is a corner that is not yet traversed, then we should remove this corner from the list of corners
+                # to visit after traversing to this node
+                corners_left = tuple([ corner for corner in corners_remaining if corner != (nextx, nexty)])
+
+                # push the state,action,cost to the successor list
                 successors.append(  ( (next_position,corners_left), action, self.action_cost)  )
 
         self._expanded += 1 # DO NOT CHANGE
@@ -439,93 +521,120 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    #""" Shortest path based heuristic function - expands a total of 592 nodes
-
     """
-    Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5
-    Path found with total cost of 106 in 0.0 seconds
-    Search nodes expanded: 592
-    Pacman emerges victorious! Score: 434
-    Average Score: 434.0
-    Scores:        434.0
-    Win Rate:      1/1 (1.00)
-    Record:        Win
+        Shortest path based heuristic function - expands a total of 965 nodes for medium search problem
+        
+        Explanation:
+            For each unvisited corner:
+                o distance_to_corner <= Find the distance from current position to the corner.
+                o min_distance_path_from_that_corner_reach_all_other_corners 
+                
+            eg 
+            Consider following corners that are unvisited:
+                corners:        (1,1),(1,top),(right,1),(right,top)
+                current point:  (x,y)
+                
+                    lets take corner (1,1) :
+                        o find the shortest distance from (x,y) to (1,1) --> note this can be done in O(1) using our problem.dpleftbottom dp matrix
+                        o min_distance_path_from_1,1_to_traverse_all_other_corners:
+                            these paths can be:
+                                (1,1) -> (1,top) -> (right,top) -> (right,1)
+                                (1,1) -> (right,top) -> (1,top) -> (right,1)
+                                (1,1) -> (right,1) -> (1,top) -> (right,top)
+                                (1,1) -> (1,top) -> (right,1) -> (right,top)
+                                (1,1) -> (right,top) -> (right,1) -> (1,top)
+                                (1,1) -> (right,1) -> (right,top) -> (1,top)
+                            
+                            find the minimum distance path from the above path. 
+                            
+                            To find all such paths, 
+                            I have created a generic recursive function, 
+                            that can enumerate all the paths and select the minimum from them.
+                        
+                We will have to do the same starting from each of the other corners.
+                
+    ****** Note: Due to our pre-calculation using DP matrix, all of the above operations can now happen in constant time ****** 
+    
     """
-
-
     x, y = state[0]
-    #print "calculating heuristics for ", (x, y)
-    cor_rem = state[1]
+    corner_remaining = state[1]
     top, right = walls.height - 2, walls.width - 2
+
+    # distance array, that will contain
     distance = []
-    for (x1, y1) in cor_rem:
-        if x1 == 1 and y1 == 1:  # left bottom
-            #print "checking for left btttom"
-            distance.append(find_minimum_from_corners(cor_rem, problem.dpleftbottom, x, x1, y, y1,problem.shortestDistance))
-        if x1 == 1 and y1 == top:  # left top
-            #print "checking for left top"
-            distance.append(find_minimum_from_corners(cor_rem, problem.dplefttop, x, x1, y, y1,problem.shortestDistance))
-        if x1 == right and y1 == 1:  # right bottom
-            #print "checking for right bottom"
-            distance.append(find_minimum_from_corners(cor_rem, problem.dprightbottom, x, x1, y, y1,problem.shortestDistance))
-        if x1 == right and y1 == top:  # left bottom
-            #print "checking for right top"
-            distance.append(find_minimum_from_corners(cor_rem, problem.dprighttop, x, x1, y, y1,problem.shortestDistance))
+    for (cornerx, cornery) in corner_remaining:
 
+        # left bottom. Enumerate all paths from left bottom corner and find the minimum path
+        if cornerx == 1 and cornery == 1:
+            distance.append(find_minimum_from_corners(corner_remaining, problem.dpleftbottom, x, cornerx, y, cornery,problem.shortestDistanceBetweenCorners))
 
+        # left top. Enumerate all paths from left top corner and find the minimum path
+        if cornerx == 1 and cornery == top:
+            distance.append(find_minimum_from_corners(corner_remaining, problem.dplefttop, x, cornerx, y, cornery,problem.shortestDistanceBetweenCorners))
+
+        # right bottom. Enumerate all paths from right bottom corner and find the minimum path
+        if cornerx == right and cornery == 1:
+            distance.append(find_minimum_from_corners(corner_remaining, problem.dprightbottom, x, cornerx, y, cornery,problem.shortestDistanceBetweenCorners))
+
+        # right top. Enumerate all paths from rght top corner and find the minimum path
+        if cornerx == right and cornery == top:
+            distance.append(find_minimum_from_corners(corner_remaining, problem.dprighttop, x, cornerx, y, cornery,problem.shortestDistanceBetweenCorners))
+
+    # distance array now contains minimum paths starting from each corner
+    # we now sort the distance array and find the ideal corner, from which we will incur a minimum path
     distance.sort()
-    #print distance
+
+    # there were actually some unvisited corners pending, then distance array will have at least 1 value and we can now denote the minimum
+    # value in the distance array as our heuristic
     if distance:
-        #print "returning ", (distance[0]-1)
         return (distance[0])
+
+    # most probably a goal state as no corners left to find the min dist
     return 0
-
-
-
-    #manhattan distance heuristic - expands a total of 21920 nodes
-    # x,y = state[0]
-    # cor_rem = state[1]
-    # distance =  [ (abs(x-x1)+abs(y-y1)) for (x1,y1) in cor_rem ]
-    #
-    # if distance:
-    #     return sum(distance)
-    #
-    # return 0
-
 
     """ null heuristic - expands a total of 2010522 nodes """
     #return 0 # Default to trivial solution
 
 
-def find_minimum_from_corners(cor_rem, dp, x, x1, y, y1,shortestDistance):
-    sum = 0
-    sum += dp[y - 1][x - 1]
-    #print "adding " , (y-1,x-1), " = " , dp[y-1][x-1]
+def find_minimum_from_corners(cor_rem, dp, positionx, cornerx, positiony, cornery, shortestDistancebetweencorners):
 
+    # First add the distance from point(positionx,positiony) in the maze to the corner( cornerx,cornery )
+    distance_to_corner = 0
+    distance_to_corner += dp[positiony - 1][positionx - 1]
+
+    # mark the corner as visited as we do not want to explore the corner again when we enumerate all the paths below
     visited = {}
-    visited[(x1,y1)] = True
+    visited[(cornerx, cornery)] = True
 
-    minFound = distMin( (x1,y1) , cor_rem , visited , shortestDistance )
-    #print minFound
+    # enumerate all the remaining paths and find the min path distance from them
+    minDistanceFound = distMin((cornerx, cornery), cor_rem, visited, shortestDistancebetweencorners)
 
-    # for (x2, y2) in cor_rem:
-    #     if not ( y1 != y2 and x1 != x2 ):
-    #         sum += dp[y2 - 1][x2 - 1]
-    #         print "adding ", (y2 - 1, x2 - 1), " = " , dp[y2-1][x2-1]
-
-    return sum + minFound
+    # thus mindistance incurred if we choose corner( cornerx,cornery ) is distance_to_corner + minDistanceFound
+    return distance_to_corner + minDistanceFound
 
 def distMin( prev,corners,visited,shortestDistance ):
 
-    minDist = 32424324242323
-    for next in corners:
-        if not ( visited.has_key(next) and visited.get(next) == True ):
-            visited[next] = True
-            minDist = min( minDist , shortestDistance[(prev,next)] + distMin(next,corners,visited,shortestDistance) )
-            visited[next] = False
+    # initially assign a huge value to minDist
+    minDist = 99999999
 
-    if minDist == 32424324242323:
+    # then explore/enumerate for each of the other unvisited corners
+    for next_corner in corners:
+
+        # if the next corner is not visited or its visited value is false, then try this path and find the shortest distance from here
+        if not ( visited.has_key(next_corner) and visited.get(next_corner) == True ):
+
+            # Mark it as visited, so that it is not selected twice in the path between all corners
+            visited[next_corner] = True
+            # Find the minimum distance if we select next_corner as our next node in the path
+            minDist = min( minDist , shortestDistance[(prev,next_corner)] + distMin(next_corner,corners,visited,shortestDistance) )
+            # Again mark it as false, so that other paths can explore this node
+            visited[next_corner] = False
+
+    # if minDist is 99999999, then probably there are no more corners to visit. So, return 0
+    if minDist == 99999999:
         return 0
+
+    # Else return the minDist
     return minDist
 
 class AStarCornersAgent(SearchAgent):
@@ -549,24 +658,42 @@ class FoodSearchProblem:
         self.startingGameState = startingGameState
         self._expanded = 0 # DO NOT CHANGE
         self.heuristicInfo = {} # A dictionary for the heuristic to store information
-        self.distance = {}
+
+        # distance_between_food_points <= To store the min distance between each food position
+        self.distance_between_food_points = {}
+
+        # foodGrid <= the list of food points
         foodGrid = startingGameState.getFood()
+
+        # mapfoodtonumber <= hashMap to uniquely index each food point. i.e. converts a food-point to a unique index
         self.mapfoodtonumber = {}
+
+        # mapnumbertofood <= reverse hashmap of mapfoodtonumber. i.e. find the food-point given a unique index
         self.mapnumbertofood = {}
+
+        # uniquenumber generator for each food-point
         uniqueNumber = 0
+
         for food in foodGrid.asList():
+
+            # If food has been assigned a unique number, assign it a unique number and store these details in our hashMap
             if( not self.mapfoodtonumber.has_key(food) ):
                 self.mapfoodtonumber[food] = uniqueNumber
                 self.mapnumbertofood[uniqueNumber] = food
                 uniqueNumber += 1
+
             for other_food in foodGrid.asList():
                 if (not self.mapfoodtonumber.has_key(other_food)):
                     self.mapfoodtonumber[other_food] = uniqueNumber
                     self.mapnumbertofood[uniqueNumber] = other_food
                     uniqueNumber += 1
+
+                # find the distance between food and other-food points
                 dist = mazeDistance(food, other_food, startingGameState)
-                self.distance[ (self.mapfoodtonumber[food],self.mapfoodtonumber[other_food]) ] = dist
-                self.distance[ (self.mapfoodtonumber[other_food],self.mapfoodtonumber[food]) ] = dist
+
+                # store this distance in our DP matrix
+                self.distance_between_food_points[ (self.mapfoodtonumber[food],self.mapfoodtonumber[other_food]) ] = dist
+                self.distance_between_food_points[ (self.mapfoodtonumber[other_food],self.mapfoodtonumber[food]) ] = dist
 
     def getStartState(self):
         return self.start
@@ -636,99 +763,49 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+
+
+    """ Credits: https://stackoverflow.com/a/36404229/2802539
+            
+        Explanation: 
+            o Find the distance between 2 farthest food points in the current maze state.
+                o Since, in any case, our pacman will always have to travel this distance.
+            o Find the distance from curent pacman position to closest of these 2 farthest food points
+            
+        To solve the problem, we will have to first find the 2 farthest food points. This can be done in O(n^2) - because we have already pre-calculated the distance
+        between each food-point in the maze in the problem class.
+        
+        Thus, the heuristic function runs in O(n^2) where, n = number of remaining food-points
+    """
+
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    """
-    Sunnys - MacBook - Pro:search sunnyshah$ py2 pacman.py - l trickySearch - p AStarFoodSearchAgent 
-    Path found with total cost of 120 in 5.8 seconds
-    Search nodes expanded: 308
-    Pacman emerges victorious! Score: 510
-    Average
-    Score: 510.0
-    Scores:        510.0
-    Win
-    Rate:      1 / 1(1.00)
-    Record:        Win
-    """
-    """
-    print position
-    sumright = 0
-    sumleft = 0
-    for food in foodGrid.asList():
-        if food[0] < position[0]:
-            sumleft += 1
-        if food[0] > position[0]:
-            sumright += 1
-        #sum = min(sum,mazeDistance(position, food, problem.startingGameState))
 
-    return -1*(abs(sumleft-sumright))
-    """
-
+    # maxDistance <= to store the distance between the 2 farthest points
     maxDistance = -1
+
+    # point1 and point2 <= to store the 2 farthest points
     point1 = None
     point2 = None
 
+    # If there are no food-points left, then we have reached the goal state
     if len(foodGrid.asList())==0:
         return 0
 
+    # calculate the distance between each food-point pair using our DP matrix problem.distance_between_food_points and HashMaps
     for food in foodGrid.asList():
         for other_food in foodGrid.asList():
-            if( maxDistance < problem.distance[(problem.mapfoodtonumber[food],problem.mapfoodtonumber[other_food])] ):
-                maxDistance = problem.distance[(problem.mapfoodtonumber[food],problem.mapfoodtonumber[other_food])]
+
+            # store the details of the 2 farthest points
+            if( maxDistance < problem.distance_between_food_points[(problem.mapfoodtonumber[food],problem.mapfoodtonumber[other_food])] ):
+                maxDistance = problem.distance_between_food_points[(problem.mapfoodtonumber[food],problem.mapfoodtonumber[other_food])]
                 point1 = food
                 point2 = other_food
 
+    # now find the minimum distance from current point to point1 or point2
     minDistance = min( mazeDistance(position,point1,problem.startingGameState), mazeDistance(position,point2,problem.startingGameState) )
 
-    #print "for {0} the distance is {1}".format(position,(minDistance+maxDistance))
+    # Finally our heuristic is minDistance + maxDistance
     return minDistance + maxDistance
-
-    """
-    result = 0
-    next_foodGrid = foodGrid.deepCopy()
-    next_position = position[:]
-    for i in range(2):
-        # print "Step ",x,y,next_position,next_foodGrid
-        # compute the distances : (x,y,dist) only for existing food
-        dist_to_dots = []
-        for y2 in range(foodGrid.height):
-            for x2 in range(foodGrid.width):
-                if (next_foodGrid[x2][y2]):
-                    dist_to_dots.append((x2, y2, util.manhattanDistance(next_position, (x2, y2))))
-        # print "dist_to_dots ",dist_to_dots
-
-        if (len(dist_to_dots) == 0):
-            break
-
-        x_closest, y_closest, dist_closest = dist_to_dots[0]
-
-        for (x2, y2, dist) in dist_to_dots:
-            # print "Compare ",next_foodGrid[x_closest][y_closest],dist_to_dots[y2][x2],dist_to_dots[y_closest][x_closest]
-            if (i == 0) and (dist < dist_closest):
-                x_closest = x2
-                y_closest = y2
-                dist_closest = dist
-            if (i == 1) and (dist > dist_closest):
-                x_closest = x2
-                y_closest = y2
-                dist_closest = dist
-        # print "closest ",x_closest,y_closest
-        result += dist_closest
-        next_position = (x_closest, y_closest)
-        next_foodGrid[x_closest][y_closest] = False
-        # print "Move to ",next_position
-
-    return result
-    """
-
-    """
-    sum = 0
-    for food in foodGrid.asList():
-        sum += mazeDistance(food,position,problem.startingGameState)
-    return sum
-    """
-
-    #return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
