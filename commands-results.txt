@@ -1,4 +1,4 @@
-Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l tinyMaze -p SearchAgent -a fn=tinyMazeSearch
+Sunnys-MacBook-Pro:search sunnyshah$ time py2 pacman.py -l tinyMaze -p SearchAgent -a fn=tinyMazeSearch
 [SearchAgent] using function tinyMazeSearch
 [SearchAgent] using problem type PositionSearchProblem
 Path found with total cost of 8 in 0.0 seconds
@@ -9,7 +9,9 @@ Scores:        502.0
 Win Rate:      1/1 (1.00)
 Record:        Win
 
-Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l tinyMaze -p SearchAgent
+Sunnys-MacBook-Pro:search sunnyshah$
+
+Sunnys-MacBook-Pro:search sunnyshah$ time py2 pacman.py -l tinyMaze -p SearchAgent 
 [SearchAgent] using function depthFirstSearch
 [SearchAgent] using problem type PositionSearchProblem
 Path found with total cost of 10 in 0.0 seconds
@@ -20,7 +22,7 @@ Scores:        500.0
 Win Rate:      1/1 (1.00)
 Record:        Win
 
-Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumMaze -p SearchAgent
+Sunnys-MacBook-Pro:search sunnyshah$ time py2 pacman.py -l mediumMaze -p SearchAgent 
 [SearchAgent] using function depthFirstSearch
 [SearchAgent] using problem type PositionSearchProblem
 Path found with total cost of 130 in 0.0 seconds
@@ -31,7 +33,7 @@ Scores:        380.0
 Win Rate:      1/1 (1.00)
 Record:        Win
 
-Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l bigMaze -z .5 -p SearchAgent
+Sunnys-MacBook-Pro:search sunnyshah$ time py2 pacman.py -l bigMaze -z .5 -p SearchAgent 
 [SearchAgent] using function depthFirstSearch
 [SearchAgent] using problem type PositionSearchProblem
 Path found with total cost of 210 in 0.0 seconds
@@ -42,7 +44,7 @@ Scores:        300.0
 Win Rate:      1/1 (1.00)
 Record:        Win
 
-Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
+Sunnys-MacBook-Pro:search sunnyshah$ time py2 pacman.py -l mediumMaze -p SearchAgent -a fn=bfs 
 [SearchAgent] using function bfs
 [SearchAgent] using problem type PositionSearchProblem
 Path found with total cost of 68 in 0.0 seconds
@@ -53,7 +55,8 @@ Scores:        442.0
 Win Rate:      1/1 (1.00)
 Record:        Win
 
-Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l bigMaze -p SearchAgent -a fn=bfs -z .5
+
+Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l bigMaze -p SearchAgent -a fn=bfs -z .5 
 [SearchAgent] using function bfs
 [SearchAgent] using problem type PositionSearchProblem
 Path found with total cost of 210 in 0.1 seconds
@@ -64,26 +67,80 @@ Scores:        300.0
 Win Rate:      1/1 (1.00)
 Record:        Win
 
-Sunnys-MacBook-Pro:search sunnyshah$ py2 eightpuzzle.py
+Sunnys-MacBook-Pro:search sunnyshah$ time py2 eightpuzzle.py 
 A random puzzle:
 -------------
-| 1 | 4 | 2 |
+| 2 | 5 | 4 |
 -------------
-| 3 | 7 | 5 |
+| 1 | 3 |   |
 -------------
-| 6 |   | 8 |
+| 6 | 7 | 8 |
 -------------
-BFS found a path of 3 moves: ['up', 'up', 'left']
+BFS found a path of 9 moves: ['up', 'left', 'left', 'down', 'right', 'right', 'up', 'left', 'left']
 After 1 move: up
 -------------
-| 1 | 4 | 2 |
+| 2 | 5 |   |
 -------------
-| 3 |   | 5 |
+| 1 | 3 | 4 |
 -------------
 | 6 | 7 | 8 |
 -------------
 Press return for the next state...
-After 2 moves: up
+After 2 moves: left
+-------------
+| 2 |   | 5 |
+-------------
+| 1 | 3 | 4 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 3 moves: left
+-------------
+|   | 2 | 5 |
+-------------
+| 1 | 3 | 4 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 4 moves: down
+-------------
+| 1 | 2 | 5 |
+-------------
+|   | 3 | 4 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 5 moves: right
+-------------
+| 1 | 2 | 5 |
+-------------
+| 3 |   | 4 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 6 moves: right
+-------------
+| 1 | 2 | 5 |
+-------------
+| 3 | 4 |   |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 7 moves: up
+-------------
+| 1 | 2 |   |
+-------------
+| 3 | 4 | 5 |
+-------------
+| 6 | 7 | 8 |
+-------------
+Press return for the next state...
+After 8 moves: left
 -------------
 | 1 |   | 2 |
 -------------
@@ -91,7 +148,8 @@ After 2 moves: up
 -------------
 | 6 | 7 | 8 |
 -------------
-Press return for the next state...After 3 moves: left
+Press return for the next state...
+After 9 moves: left
 -------------
 |   | 1 | 2 |
 -------------
@@ -100,6 +158,10 @@ Press return for the next state...After 3 moves: left
 | 6 | 7 | 8 |
 -------------
 Press return for the next state...
+
+real	0m2.623s
+user	0m0.084s
+sys	0m0.029s
 
 Sunnys-MacBook-Pro:search sunnyshah$ py2 pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
 [SearchAgent] using function ucs
